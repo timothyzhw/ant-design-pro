@@ -38,6 +38,16 @@ export const getNavData = app => [
         ],
       },
       {
+        name: '权限管理',
+        icon: 'user',
+        path: 'rbac',
+        children: [{
+          name: '角色管理',
+          path: 'role-list',
+          component: dynamicWrapper(app, ['list'], () => import('../routes/Rbac/RoleList')),
+        }],
+      },
+      {
         name: '表单页',
         path: 'form',
         icon: 'form',
