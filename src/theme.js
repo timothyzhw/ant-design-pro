@@ -4,4 +4,5 @@ module.exports = {
   'card-actions-background': '#f5f8fa',
   'border-radius-base': '1px',
   'border-radius-sm': '0px',
+  'menu-collapsed-width': '50px',
 };

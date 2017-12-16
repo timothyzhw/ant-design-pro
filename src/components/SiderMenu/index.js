@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react';
-import { Layout, Menu, Icon } from 'antd';
+import { Icon, Layout, Menu } from 'antd';
 import { Link } from 'dva/router';
 import logo from '../../assets/logo.svg';
 import styles from './index.less';
@@ -16,12 +16,14 @@ export default class SiderMenu extends PureComponent {
       openKeys: this.getDefaultCollapsedSubMenus(props),
     };
   }
+
   onCollapse = (collapsed) => {
     this.props.dispatch({
       type: 'global/changeLayoutCollapsed',
       payload: collapsed,
     });
   }
+
   getDefaultCollapsedSubMenus(props) {
     const currentMenuSelectedKeys = [...this.getCurrentMenuSelectedKeys(props)];
     currentMenuSelectedKeys.splice(-1, 1);
@@ -30,6 +32,7 @@ export default class SiderMenu extends PureComponent {
     }
     return currentMenuSelectedKeys;
   }
+
   getCurrentMenuSelectedKeys(props) {
     const { location: { pathname } } = props || this.props;
     const keys = pathname.split('/').slice(1);
@@ -38,6 +41,7 @@ export default class SiderMenu extends PureComponent {
     }
     return keys;
   }
+
   getNavMenuItems(menusData, parentPath = '') {
     if (!menusData) {
       return [];
@@ -91,15 +95,17 @@ export default class SiderMenu extends PureComponent {
       );
     });
   }
+
   handleOpenChange = (openKeys) => {
     const lastOpenKey = openKeys[openKeys.length - 1];
     const isMainMenu = this.menus.some(
-      item => lastOpenKey && (item.key === lastOpenKey || item.path === lastOpenKey)
+      item => lastOpenKey && (item.key === lastOpenKey || item.path === lastOpenKey),
     );
     this.setState({
       openKeys: isMainMenu ? [lastOpenKey] : [...openKeys],
     });
   }
+
   render() {
     const { collapsed } = this.props;
 
@@ -116,6 +122,7 @@ export default class SiderMenu extends PureComponent {
         onCollapse={this.onCollapse}
         width={256}
         className={styles.sider}
+        collapsedWidth={50}
       >
         <div className={styles.logo}>
           <Link to="/">
@@ -130,6 +137,7 @@ export default class SiderMenu extends PureComponent {
           onOpenChange={this.handleOpenChange}
           selectedKeys={this.getCurrentMenuSelectedKeys()}
           style={{ padding: '16px 0', width: '100%' }}
+          subMenuCloseDelay={0.0001}
         >
           {this.getNavMenuItems(this.menus)}
         </Menu>
