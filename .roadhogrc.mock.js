@@ -1,5 +1,6 @@
 import mockjs from 'mockjs';
 import { getRule, postRule } from './mock/rule';
+import { getRole, postRole } from './mock/role';
 import { getActivities, getNotice, getFakeList } from './mock/api';
 import { getFakeChartData } from './mock/chart';
 import { imgMap } from './mock/utils';
@@ -15,7 +16,7 @@ const noProxy = process.env.NO_PROXY === 'true';
 const proxy = {
   // 支持值为 Object 和 Array
   'GET /api/currentUser': {
-    $desc: "获取当前用户接口",
+    $desc: '获取当前用户接口',
     $params: {
       pageSize: {
         desc: '分页',
@@ -58,11 +59,21 @@ const proxy = {
     },
     $body: postRule,
   },
+  'GET /api/role': getRole,
+  'POST /api/role': {
+    $params: {
+      pageSize: {
+        desc: '分页',
+        exp: 2,
+      },
+    },
+    $body: postRole,
+  },
   'POST /api/forms': (req, res) => {
     res.send({ message: 'Ok' });
   },
   'GET /api/tags': mockjs.mock({
-    'list|100': [{ name: '@city', 'value|1-100': 150, 'type|0-2': 1 }]
+    'list|100': [{ name: '@city', 'value|1-100': 150, 'type|0-2': 1 }],
   }),
   'GET /api/fake_list': getFakeList,
   'GET /api/fake_chart_data': getFakeChartData,

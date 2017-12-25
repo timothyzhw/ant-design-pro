@@ -272,9 +272,7 @@ export default class TableList extends PureComponent {
     const { selectedRows, modalVisible, addInputValue } = this.state;
 
     const menu = (
-      <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
-
-      </Menu>
+      <Menu onClick={this.handleMenuClick} selectedKeys={[]} />
     );
 
     return (

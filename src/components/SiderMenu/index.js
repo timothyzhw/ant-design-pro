@@ -107,17 +107,18 @@ export default class SiderMenu extends PureComponent {
   }
 
   render() {
-    const { collapsed } = this.props;
+    const { collapsed, customCollapsed } = this.props;
+    const finalCollapsed = (customCollapsed === null) ? collapsed : customCollapsed;
 
     // Don't show popup menu when it is been collapsed
-    const menuProps = collapsed ? {} : {
+    const menuProps = finalCollapsed ? {} : {
       openKeys: this.state.openKeys,
     };
     return (
       <Sider
         trigger={null}
         collapsible
-        collapsed={collapsed}
+        collapsed={finalCollapsed}
         breakpoint="md"
         onCollapse={this.onCollapse}
         width={256}

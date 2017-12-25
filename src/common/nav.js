@@ -3,7 +3,7 @@ import dynamic from 'dva/dynamic';
 // wrapper of dynamic
 const dynamicWrapper = (app, models, component) => dynamic({
   app,
-  models: () => models.map(m => import(`../models/${m}.js`)),
+  models: () => models.map(m => import(`../models/${m.replace('.','/')}.js`)),
   component,
 });
 
@@ -44,7 +44,7 @@ export const getNavData = app => [
         children: [{
           name: '角色管理',
           path: 'role-list',
-          component: dynamicWrapper(app, ['list'], () => import('../routes/Rbac/RoleList')),
+          component: dynamicWrapper(app, ['Rbac.role'], () => import('../routes/Rbac/RoleList')),
         }],
       },
       {

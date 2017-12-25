@@ -5,6 +5,7 @@ export default {
 
   state: {
     collapsed: false,
+    customCollapsed: null,
     notices: [],
     fetchingNotices: false,
   },
@@ -42,6 +43,13 @@ export default {
     changeLayoutCollapsed(state, { payload }) {
       return {
         ...state,
+        collapsed: payload,
+      };
+    },
+    changeCustomLayoutCollapsed(state, { payload }) {
+      return {
+        ...state,
+        customCollapsed: payload,
         collapsed: payload,
       };
     },

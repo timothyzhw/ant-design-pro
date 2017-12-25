@@ -67,10 +67,10 @@ export default class GlobalHeader extends PureComponent {
     }
   }
   toggle = () => {
-    const { collapsed } = this.props;
+    const { collapsed, customCollapsed } = this.props;
     this.props.dispatch({
-      type: 'global/changeLayoutCollapsed',
-      payload: !collapsed,
+      type: 'global/changeCustomLayoutCollapsed',
+      payload: !(customCollapsed === null ? collapsed : customCollapsed),
     });
     this.triggerResizeEvent();
   }
@@ -97,7 +97,7 @@ export default class GlobalHeader extends PureComponent {
       <Header className={styles.header}>
         <Icon
           className={styles.trigger}
-          type={collapsed ? 'menu-unfold' : 'menu-fold'}
+          type={collapsed ? 'bars' : 'bars'}
           onClick={this.toggle}
         />
         <div className={styles.right}>

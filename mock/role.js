@@ -1,10 +1,9 @@
-/* eslint-disable prefer-destructuring */
 import { getUrlParams } from './utils';
 
 // mock roleListDataSource
 const alphabet = ['A', 'C', 'E', 'D', 'L', 'P', 'O', 'Q', 'Z', 'R', 'B', 'X', 'F', 'M', 'N'];
 let roleListDataSource = [];
-for (let i = 0; i < 45; i++) {
+for (let i = 0; i < 45; i += 1) {
   roleListDataSource.push({
     id: i,
     code: i * 100,
@@ -78,6 +77,7 @@ export function postRole(req, res, u, b) {
     url = req.url;
   }
 
+  const i = Math.ceil(Math.random() * 10000);
   const body = (b && b.body) || req.body;
   const { method, no, description } = body;
 
@@ -86,7 +86,6 @@ export function postRole(req, res, u, b) {
       roleListDataSource = roleListDataSource.filter(item => no.indexOf(item.no) === -1);
       break;
     case 'post':
-      const i = Math.ceil(Math.random() * 10000);
       roleListDataSource.unshift({
         id: i,
         code: i * 100,
