@@ -32,8 +32,8 @@ class SelectTable extends PureComponent {
   }
 
   render() {
-    const { selectedRowKeys, columns } = this.state;
-    const { data: { list, pagination }, loading } = this.props;
+    const { selectedRowKeys } = this.state;
+    const { data: { list, pagination }, loading, columns } = this.props;
 
     const paginationProps = {
       showSizeChanger: true,
