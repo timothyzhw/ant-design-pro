@@ -1,18 +1,40 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Layout, Icon } from 'antd';
+import { Layout, Icon, message } from 'antd';
 import DocumentTitle from 'react-document-title';
 import { connect } from 'dva';
 import { Route, Redirect, Switch } from 'dva/router';
 import { ContainerQuery } from 'react-container-query';
 import classNames from 'classnames';
+import { enquireScreen } from 'enquire-js';
 import GlobalHeader from '../components/GlobalHeader';
 import GlobalFooter from '../components/GlobalFooter';
 import SiderMenu from '../components/SiderMenu';
 import NotFound from '../routes/Exception/404';
+import { getRoutes } from '../utils/utils';
+import { getMenuData } from '../common/menu';
+import logo from '../assets/logo.svg';
+
+/**
+ * 根据菜单取得重定向地址.
+ */
+const redirectData = [];
+const getRedirect = (item) => {
+  if (item && item.children) {
+    if (item.children[0] && item.children[0].path) {
+      redirectData.push({
+        from: `/${item.path}`,
+        to: `/${item.children[0].path}`,
+      });
+      item.children.forEach((children) => {
+        getRedirect(children);
+      });
+    }
+  }
+};
+getMenuData().forEach(getRedirect);
 
 const { Content } = Layout;
-
 const query = {
   'screen-xs': {
     maxWidth: 575,
@@ -34,91 +56,120 @@ const query = {
   },
 };
 
+let isMobile;
+enquireScreen((b) => {
+  isMobile = b;
+});
+
 class BasicLayout extends React.PureComponent {
   static childContextTypes = {
     location: PropTypes.object,
     breadcrumbNameMap: PropTypes.object,
-    routeData: PropTypes.array,
   }
+  state = {
+    isMobile,
+  };
   getChildContext() {
-    const { location, navData, getRouteData } = this.props;
-    const routeData = getRouteData('BasicLayout');
-    const firstMenuData = navData.reduce((arr, current) => arr.concat(current.children), []);
-    const menuData = this.getMenuData(firstMenuData, '');
-    const breadcrumbNameMap = {};
-
-    routeData.concat(menuData).forEach((item) => {
-      breadcrumbNameMap[item.path] = {
-        name: item.name,
-        component: item.component,
-      };
+    const { location, routerData } = this.props;
+    return {
+      location,
+      breadcrumbNameMap: routerData,
+    };
+  }
+  componentDidMount() {
+    enquireScreen((mobile) => {
+      this.setState({
+        isMobile: mobile,
+      });
     });
-    return { location, breadcrumbNameMap, routeData };
+    this.props.dispatch({
+      type: 'user/fetchCurrent',
+    });
   }
   getPageTitle() {
-    const { location, getRouteData } = this.props;
+    const { routerData, location } = this.props;
     const { pathname } = location;
     let title = 'Ant Design Pro';
-    getRouteData('BasicLayout').forEach((item) => {
-      if (item.path === pathname) {
-        title = `${item.name} - Ant Design Pro`;
-      }
-    });
+    if (routerData[pathname] && routerData[pathname].name) {
+      title = `${routerData[pathname].name} - Ant Design Pro`;
+    }
     return title;
   }
-  getMenuData = (data, parentPath) => {
-    let arr = [];
-    data.forEach((item) => {
-      if (item.name) {
-        arr.push({ path: `${parentPath}/${item.path}`, name: item.name });
-      }
-      if (item.children) {
-        arr = arr.concat(this.getMenuData(item.children, `${parentPath}/${item.path}`));
-      }
+  handleMenuCollapse = (collapsed) => {
+    this.props.dispatch({
+      type: 'global/changeLayoutCollapsed',
+      payload: collapsed,
     });
-    return arr;
+  }
+  handleNoticeClear = (type) => {
+    message.success(`清空了${type}`);
+    this.props.dispatch({
+      type: 'global/clearNotices',
+      payload: type,
+    });
+  }
+  handleMenuClick = ({ key }) => {
+    if (key === 'logout') {
+      this.props.dispatch({
+        type: 'login/logout',
+      });
+    }
+  }
+  handleNoticeVisibleChange = (visible) => {
+    if (visible) {
+      this.props.dispatch({
+        type: 'global/fetchNotices',
+      });
+    }
   }
   render() {
     const {
       currentUser, collapsed, customCollapsed,
-      fetchingNotices, notices, getRouteData, navData, location, dispatch,
+      currentUser, collapsed, fetchingNotices, notices, getRouteData, navData, location, dispatch,
     } = this.props;
-
     const layout = (
       <Layout>
         <SiderMenu
           collapsed={collapsed}
           customCollapsed={customCollapsed}
-          navData={navData}
           location={location}
-          dispatch={dispatch}
+          isMobile={this.state.isMobile}
+          onCollapse={this.handleMenuCollapse}
         />
         <Layout>
           <GlobalHeader
+            logo={logo}
             currentUser={currentUser}
             fetchingNotices={fetchingNotices}
             notices={notices}
             collapsed={collapsed}
             customCollapsed={customCollapsed}
-            dispatch={dispatch}
+            isMobile={this.state.isMobile}
+            onNoticeClear={this.handleNoticeClear}
+            onCollapse={this.handleMenuCollapse}
+            onMenuClick={this.handleMenuClick}
+            onNoticeVisibleChange={this.handleNoticeVisibleChange}
           />
           <Content style={{ margin: '24px 24px 0', height: '100%' }}>
             <div style={{ minHeight: 'calc(100vh - 260px)' }}>
               <Switch>
                 {
-                  getRouteData('BasicLayout').map(item =>
-                    (
-                      <Route
-                        exact={item.exact}
-                        key={item.path}
-                        path={item.path}
-                        component={item.component}
-                      />
-                    )
+                  redirectData.map(item =>
+                    <Redirect key={item.from} exact from={item.from} to={item.to} />
                   )
                 }
+                {
+                  getRoutes(match.path, routerData).map(item => (
+                    <Route
+                      key={item.key}
+                      path={item.path}
+                      component={item.component}
+                      exact={item.exact}
+                    />
+                  ))
+                }
                 <Redirect exact from="/" to="/dashboard/analysis" />
-                <Route component={NotFound} />
+                <Route render={NotFound} />
               </Switch>
             </div>
             <GlobalFooter
