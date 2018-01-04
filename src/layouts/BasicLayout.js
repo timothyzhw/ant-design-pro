@@ -124,14 +124,12 @@ class BasicLayout extends React.PureComponent {
   }
   render() {
     const {
-      currentUser, collapsed, customCollapsed,
-      currentUser, collapsed, fetchingNotices, notices, getRouteData, navData, location, dispatch,
+      currentUser, collapsed, fetchingNotices, notices, routerData, match, location,
     } = this.props;
     const layout = (
       <Layout>
         <SiderMenu
           collapsed={collapsed}
-          customCollapsed={customCollapsed}
           location={location}
           isMobile={this.state.isMobile}
           onCollapse={this.handleMenuCollapse}
@@ -143,7 +141,6 @@ class BasicLayout extends React.PureComponent {
             fetchingNotices={fetchingNotices}
             notices={notices}
             collapsed={collapsed}
-            customCollapsed={customCollapsed}
             isMobile={this.state.isMobile}
             onNoticeClear={this.handleNoticeClear}
             onCollapse={this.handleMenuCollapse}
@@ -210,7 +207,6 @@ class BasicLayout extends React.PureComponent {
 export default connect(state => ({
   currentUser: state.user.currentUser,
   collapsed: state.global.collapsed,
-  customCollapsed: state.global.customCollapsed,
   fetchingNotices: state.global.fetchingNotices,
   notices: state.global.notices,
 }))(BasicLayout);
